@@ -22,5 +22,5 @@ PNG Parallel Compressor is a project designed to accelerate the PNG compression 
 
 **License**
 This project is licensed under the Apache License. See the LICENSE file for details.
-
+ 
 **Acknowledgments**
