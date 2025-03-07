@@ -6,8 +6,8 @@ PNG Parallel Compressor is a project designed to accelerate the PNG compression 
 
 1. Compile the Project
      ```bash
-          cd PNG-Parallel-Compression
-          g++ src/ReadScanLine.cpp src/lodepng.cpp -Wall -Wextra -pedantic -ansi -O3 -o program.out
+     cd PNG-Parallel-Compression
+     g++ src/ReadScanLine.cpp src/lodepng.cpp -Wall -Wextra -pedantic -ansi -O3 -o program.out
      ```
 
 2. Run the Executable
@@ -21,4 +21,4 @@ PNG Parallel Compressor is a project designed to accelerate the PNG compression 
 This project is licensed under the Apache License. See the LICENSE file for details.
  
 **Acknowledgments**
-[lodepng][https://github.com/lvandeve/lodepng]
+[lodepng](https://github.com/lvandeve/lodepng)
