@@ -30,4 +30,7 @@
 *.exe
 *.out
 *.app
+
+# misc
 src/test_image.png
+*.vscode
