@@ -68,7 +68,6 @@ void createCheckerBoardPNG(const string fileName, unsigned w, unsigned h, unsign
     } 
 }
 
-
 int main() {
 
     const string FOLDER_PATH = "tests/img/";
