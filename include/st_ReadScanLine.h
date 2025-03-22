@@ -1,4 +1,4 @@
-#include "../include/lodepng.h"  // Use double quotes for local files
+#include "../libs/lodepng.h"  // Use double quotes for local files
 #include <iostream>
 #include <vector>
 
