@@ -1,10 +1,11 @@
-#include "../libs/lodepng.h"
 #include <iostream>
 #include <vector>
+#include "../libs/lodepng.h"
 
 using namespace std; 
 
-void createTestPNG(const string fileName, unsigned w, unsigned h) {
+// creates rainbow gradient test image 
+void createTestPNG1(const string fileName, unsigned w, unsigned h) {
     vector<unsigned char> image(w * h * 4);
 
     for (unsigned y = 0; y < h; ++y) {
@@ -23,4 +24,14 @@ void createTestPNG(const string fileName, unsigned w, unsigned h) {
     } else {
         cout << "Image saved as " << fileName << endl;
     }
+}
+
+int main() {
+    const string test1 = "tests/img/test1.png"; 
+    unsigned w1 = 16; 
+    unsigned h1 = 16; 
+
+    createTestPNG1(test1, h1, w1); 
+
+    return 0; 
 }

@@ -34,3 +34,6 @@
 # misc
 src/test_image.png
 *.vscode
+
+# Images created for testing 
+*.png
