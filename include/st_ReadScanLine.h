@@ -23,7 +23,6 @@ vector<vector<Pixel> > readScanLines(const string fileName) {
 
     // Iterates over each row of the image
     for (unsigned y = 0; y < h; y++) {
-        cout << "Scanline " << y << ": ";  
         unsigned start_index = y * w * 4;
 
         // iterates over the each pixel for a row 
@@ -31,7 +30,6 @@ vector<vector<Pixel> > readScanLines(const string fileName) {
             unsigned index = start_index + x * 4;
             Pixel p = {image[index], image[index + 1], image[index + 2], image[index + 3]};
             pixels[y][x] = p; 
-            cout << "(" << (int)p.r << "," << (int)p.g << "," << (int)p.b << "," << (int)p.a << ") "; 
         }
         cout << endl;
     }
