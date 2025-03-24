@@ -80,8 +80,3 @@ vector<vector<Pixel> > st_readScanLines(const string fileName) {
     
     return pixels;
 }
-
-
-
-
-
