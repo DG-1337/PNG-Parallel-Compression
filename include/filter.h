@@ -5,10 +5,10 @@
 using namespace std;
 
 void applyNoneFilter();
-vector<unsigned char> applySubFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
-vector<unsigned char> applyUpFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
-vector<unsigned char> applyAverageFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
-vector<unsigned char> applyPaethFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
+vector<unsigned char> applySubFilter(vector<unsigned char> image, unsigned width, unsigned currentRow);
+vector<unsigned char> applyUpFilter(vector<unsigned char> image, unsigned width, unsigned currentRow);
+vector<unsigned char> applyAverageFilter(vector<unsigned char> image, unsigned width, unsigned currentRow);
+vector<unsigned char> applyPaethFilter(vector<unsigned char> image, unsigned width, unsigned currentRow);
 int paethPredictor(int a, int b, int c);
 
 void applyNoneFilter()
@@ -38,7 +38,7 @@ vector<unsigned char> applyUpFilter(vector<unsigned char> image, unsigned width,
     //can't apply up filter on first row of image
     if (currentRow == 0)
     {
-        return;
+        return ;
     }
 
     //start at first pixel of row
@@ -143,4 +143,5 @@ int paethPredictor(int a, int b, int c)
     {
         return c;
     }
+
 }
