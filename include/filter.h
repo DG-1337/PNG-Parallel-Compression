@@ -38,7 +38,7 @@ vector<unsigned char> applyUpFilter(vector<unsigned char> image, unsigned width,
     //can't apply up filter on first row of image
     if (currentRow == 0)
     {
-        return ;
+        return image;
     }
 
     //start at first pixel of row
@@ -61,7 +61,7 @@ vector<unsigned char> applyAverageFilter(vector<unsigned char> image, unsigned w
     //can't apply average filter on first row of image
     if (currentRow == 0)
     {
-        return;
+        return image;
     }
 
     //start at 2nd pixel of row
@@ -90,7 +90,7 @@ vector<unsigned char> applyPaethFilter(vector<unsigned char> image, unsigned wid
     //can't apply average filter on first row of image
     if (currentRow == 0)
     {
-        return;
+        return image;
     }
 
     //start at 2nd pixel of row
