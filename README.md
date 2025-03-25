@@ -38,7 +38,7 @@ PNG Parallel Compressor is written using mainly C++ for comfortability of multit
     g++ tests/test_files.cpp src/lodepng.cpp -std=c++11 -stdlib=libc++ -Weverything -o program_test.out
     ```
 
-    Ensure `tests/img` folder exists 
+    Ensure tests/img folder exists 
 ### Run the Executable
    ```
     ./program.out
