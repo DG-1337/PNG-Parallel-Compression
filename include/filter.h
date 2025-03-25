@@ -5,10 +5,10 @@
 using namespace std;
 
 void applyNoneFilter();
-void applySubFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
-void applyUpFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
-void applyAverageFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
-void applyPaethFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
+vector<unsigned char> applySubFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
+vector<unsigned char> applyUpFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
+vector<unsigned char> applyAverageFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
+vector<unsigned char> applyPaethFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
 int paethPredictor(int a, int b, int c);
 
 void applyNoneFilter()
@@ -16,7 +16,7 @@ void applyNoneFilter()
     return;
 }
 
-void applySubFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
+vector<unsigned char> applySubFilter(vector<unsigned char> image, unsigned width, unsigned currentRow)
 {
     //start from second pixel of row
     for(size_t i = 1; i < width; i++)
@@ -29,9 +29,11 @@ void applySubFilter(vector<unsigned char>& image, unsigned width, unsigned curre
         image[index + 2] -= image[index - 2]; //blue channel
         image[index + 3] -= image[index - 1]; //alpha channel
     }
+
+    return image;
 }
 
-void applyUpFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
+vector<unsigned char> applyUpFilter(vector<unsigned char> image, unsigned width, unsigned currentRow)
 {
     //can't apply up filter on first row of image
     if (currentRow == 0)
@@ -50,9 +52,11 @@ void applyUpFilter(vector<unsigned char>& image, unsigned width, unsigned curren
         image[index + 2] -= image[index - (width * 4) + 2]; //blue channel
         image[index + 3] -= image[index - (width * 4) + 3]; //alpha channel
     }
+
+    return image; 
 }
 
-void applyAverageFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
+vector<unsigned char> applyAverageFilter(vector<unsigned char> image, unsigned width, unsigned currentRow)
 {
     //can't apply average filter on first row of image
     if (currentRow == 0)
@@ -77,9 +81,11 @@ void applyAverageFilter(vector<unsigned char>& image, unsigned width, unsigned c
         image[index + 2] -= avgBlue; //blue channel
         image[index + 3] -= avgAlpha; //alpha channel
     }
+
+    return image; 
 }
 
-void applyPaethFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
+vector<unsigned char> applyPaethFilter(vector<unsigned char> image, unsigned width, unsigned currentRow)
 {
     //can't apply average filter on first row of image
     if (currentRow == 0)
@@ -108,6 +114,8 @@ void applyPaethFilter(vector<unsigned char>& image, unsigned width, unsigned cur
         image[index + 2] -= paethBlue;
         image[index + 3] -= paethAlpha;
     }
+
+    return image; 
 }
 
 //helper function for paeth filter

@@ -8,9 +8,27 @@ using namespace std;
 struct ImageData;
 struct Pixel; 
 
-// fastest approach computes the sum of absolute differences in a filtered scanline 
-int fast_filter_score() {
+// fast approach to compute the filter score by summation 
+int fastFilter_score(vector<unsigned char>& filteredScanline) {
     int score = 0; 
+
+    for(size_t i = 1; i < filteredScanline.size(); ++i) {
+        score += abs(filteredScanline[i]);
+    }
+
+    return score; 
+}
+
+// helper function to apply each subsequent filter 
+vector<unsigned char> applyFilters(ImageData imgdata, int currFilter) {
+
+}
+
+// applys each filter and computes its score to decide which filter is best 
+void adaptiveFilter(ImageData imgdata) {
+    vector<unsigned char> bestScanline; 
+    int bestFilter = 0; 
+    int minScore = INT_MAX; 
 }
 
 int main(int argc, char** argv) {
@@ -21,8 +39,5 @@ int main(int argc, char** argv) {
     }
 
     ImageData imgdata = readScanLines(fileName); 
-    vector<vector<Pixel> > pixels = mt_readScanLines(fileName); 
-
-
     return 0; 
 }
