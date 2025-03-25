@@ -36,7 +36,7 @@ vector<vector<Pixel> > mt_readScanLines(const string fileName) {
             
             // places image pixel data back into a vector to better organize the data with type Pixel 
             for (unsigned x = 0; x < w; x++) {
-                unsigned index = (y * w  + x) * 4; 
+                size_t index = (y * w  + x) * 4; 
                 pixels[y][x] = {image[index], image[index + 1], image[index + 2], image[index + 3]};    
             }
         }
@@ -68,11 +68,11 @@ vector<vector<Pixel> > st_readScanLines(const string fileName) {
 
     // Iterates over each row of the image
     for (unsigned y = 0; y < h; y++) {
-        unsigned start_index = y * w * 4;
+        size_t start_index = y * w * 4;
 
         // iterates over the each pixel for a row 
         for (unsigned x = 0; x < w; x++) {
-            unsigned index = start_index + x * 4;
+            size_t index = start_index + x * 4;
             Pixel p = {image[index], image[index + 1], image[index + 2], image[index + 3]};
             pixels[y][x] = p; 
         }

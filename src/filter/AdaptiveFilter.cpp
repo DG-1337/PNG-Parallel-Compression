@@ -1,16 +1,28 @@
 #include <stdio.h>
 #include "../../include/filter.h"
 #include "../../include/ReadScanLine.h"
+#include <filesystem>
 
-int adaptiveFilter(){
-    return 0; 
+
+using namespace std; 
+struct ImageData;
+struct Pixel; 
+
+// fastest approach computes the sum of absolute differences in a filtered scanline 
+int fast_filter_score() {
+    int score = 0; 
 }
 
+int main(int argc, char** argv) {
+    string fileName = "tests/img/test1.png"; 
 
-int main(char* argv[], int argc) {
-    if (argc == 1) {
-        cout << argv[1] << endl; 
+    if (argc == 2) {
+        fileName = argv[1];
     }
+
+    ImageData imgdata = readScanLines(fileName); 
+    vector<vector<Pixel> > pixels = mt_readScanLines(fileName); 
+
 
     return 0; 
 }
