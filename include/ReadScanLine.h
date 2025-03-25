@@ -10,9 +10,30 @@ struct Pixel {
     unsigned r, g, b, a;
 };
 
+struct ImageData {
+    vector<unsigned char> image; 
+    unsigned w, h; 
+    const string fileName; 
+};
+
+// Single vector approach
+ImageData readScanLines(const string fileName) {
+    vector<unsigned char> image;            // vector containing r, g, b, a values for each pixel 
+    unsigned w, h;                          // width and height 
+
+    unsigned err = lodepng::decode(image, w, h, fileName); 
+    if (err) {
+        cout << "Decoding error" << err << ":" << lodepng_error_text(err) << endl; 
+    }
+
+    ImageData imgData = {image, w, h, fileName}; 
+    return imgData;
+}
+
+
 // Multi-threaded implementation, reads an image file and gets (r, b, g, a) values of a given image 
 vector<vector<Pixel> > mt_readScanLines(const string fileName) {
-    vector<unsigned char> image;
+    vector<unsigned char> image;            // vector containing r, g, b, a values for each pixel 
     unsigned w, h;
 
     unsigned err = lodepng::decode(image, w, h, fileName);
@@ -80,8 +101,3 @@ vector<vector<Pixel> > st_readScanLines(const string fileName) {
     
     return pixels;
 }
-
-
-
-
-
