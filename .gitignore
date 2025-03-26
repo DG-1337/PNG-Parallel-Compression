@@ -37,3 +37,5 @@ src/test_image.png
 
 # Images created for testing 
 *.png
+
+*.dSYM
