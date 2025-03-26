@@ -119,7 +119,7 @@ vector<unsigned char> applyPaethFilter(vector<unsigned char> image, unsigned wid
 }
 
 //helper function for paeth filter
-//a = left pixel, b = above pixel, c = above left pixel
+//a = left pixel, b = above pixel, c = above left  bvpixel
 int paethPredictor(int a, int b, int c)
 {
     //calculate values

@@ -78,6 +78,7 @@ int main() {
     const string TEST4 = FOLDER_PATH + "test4.png";
     const string TEST5 = FOLDER_PATH + "test5.png";
     const string TEST6 = FOLDER_PATH + "test6.png";
+    const string TEST7 = FOLDER_PATH + "test7.png";
 
     // Solid images 
     createTestPNG1(TEST1, 16, 16, 255);                     // creates solid image 16 x 16 
@@ -88,4 +89,7 @@ int main() {
     createTestPNG1(TEST4, 16, 16, 128);                   
     createSolidGrayscalePNG(TEST5, 256, 256, 128);        
     createCheckerBoardPNG(TEST6, 128, 128, 16, 128);        
+
+    // small image used to test
+    createTestPNG1(TEST7, 4, 4, 200); 
 }
