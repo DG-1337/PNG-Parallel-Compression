@@ -5,7 +5,7 @@
 using namespace std; 
 
 // creates rainbow gradient test image 
-void createTestPNG1(const string fileName, unsigned w, unsigned h, unsigned alpha) {
+vector<unsigned char> createTestPNG1(const string fileName, unsigned w, unsigned h, unsigned alpha) {
     vector<unsigned char> image(w * h * 4);
 
     for (unsigned y = 0; y < h; ++y) {
@@ -22,10 +22,11 @@ void createTestPNG1(const string fileName, unsigned w, unsigned h, unsigned alph
     if (err) {
         cout << "Encoding error " << err << ": " << lodepng_error_text(err) << endl;
     } 
+    return image; 
 }
 
 // Creates a gray non-transparent image 
-void createSolidGrayscalePNG(const string fileName, unsigned w, unsigned h, unsigned alpha) {
+vector<unsigned char> createSolidGrayscalePNG(const string fileName, unsigned w, unsigned h, unsigned alpha) {
     vector <unsigned char> image(w * h * 4); 
 
     for (unsigned y = 0; y < h; y ++) {
@@ -43,10 +44,11 @@ void createSolidGrayscalePNG(const string fileName, unsigned w, unsigned h, unsi
     if (err) {
         cout << "Encoding error " << err << ": " << lodepng_error_text(err) << endl;
     } 
+    return image; 
 }
 
 // Creates checkered board pattern image 
-void createCheckerBoardPNG(const string fileName, unsigned w, unsigned h, unsigned size, unsigned alpha) {
+vector<unsigned char> createCheckerBoardPNG(const string fileName, unsigned w, unsigned h, unsigned size, unsigned alpha) {
     vector <unsigned char> image(w * h * 4); 
 
     for (unsigned y = 0; y < h; y ++) {
@@ -66,6 +68,7 @@ void createCheckerBoardPNG(const string fileName, unsigned w, unsigned h, unsign
     if (err) {
         cout << "Encoding error " << err << ": " << lodepng_error_text(err) << endl;
     } 
+    return image; 
 }
 
 int main() {
