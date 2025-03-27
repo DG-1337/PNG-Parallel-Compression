@@ -22,7 +22,6 @@ void printScanLine(vector<unsigned char> scanline, unsigned w, int filterMethod 
         (int)scanline[index + 3] << ") ";
     }
     cout << endl; 
-    
 }
 
 // fast approach to compute the filter score by summation of absolute difference 
@@ -66,14 +65,15 @@ ImageData adaptiveFilter(ImageData imgdata) {
     // Initialize empty 0 vector with size of previous vector to store filtered scanlines 
     size_t vecSize = imgdata.image.size();
     vector<unsigned char> filteredVec(vecSize);     
-    cout << "Filtering: " << endl; 
 
     for (size_t y = 0; y < imgdata.h; ++ y) {
         vector<unsigned char> bestScanline;         // saves best minimum scoring scanline 
         int bestFilter = -1;                        // save best minimum scoring filter
         int minScore = INT_MAX;                     // save best minimum score 
-        size_t start_index = y * imgdata.w * 4; 
-        vector<unsigned char> currScanline = getSingleScanline(imgdata.image, imgdata.w, y);
+        size_t start_index = y * imgdata.w * 4;   
+
+         // gets curr scanline to apply filters for
+        vector<unsigned char> currScanline = getSingleScanline(imgdata.image, imgdata.w, y);       
 
         // Applies each and every filter 
         for (int filterType = 0; filterType < 5; ++filterType){
@@ -87,7 +87,8 @@ ImageData adaptiveFilter(ImageData imgdata) {
                 bestScanline = filteredScanline;            // update scanline
             }
         }
-        // iterates through best scanline from filters 
+
+        // iterates through best scanline from filters and places values in vector 
         for (size_t x = 0; x < imgdata.w; ++x) {
             size_t index = start_index + x * 4; 
             size_t filterIndex = x * 4; 
@@ -96,16 +97,10 @@ ImageData adaptiveFilter(ImageData imgdata) {
             filteredVec[index + 1] = bestScanline[filterIndex + 1];
             filteredVec[index + 2] = bestScanline[filterIndex + 2];
             filteredVec[index + 3] = bestScanline[filterIndex + 3];
-
-            cout << '(' <<
-            (int)bestScanline[index + 0] << ',' <<
-            (int)bestScanline[index + 1] << ',' <<
-            (int)bestScanline[index + 2] << ',' <<
-            (int)bestScanline[index + 3] << ") ";
         }
-        cout << endl; 
     }
 
+    // creates image struct/object and returns it 
     ImageData filteredImage = {filteredVec, imgdata.w, imgdata.h, imgdata.fileName}; 
     return filteredImage;
 }
@@ -123,35 +118,4 @@ void printImage(vector<unsigned char> pixels, unsigned w, unsigned h) {
         }
         cout << endl; 
     }
-}
-
-int main(int argc, char** argv) {
-    string fileName = "tests/img/test7.png"; 
-    ImageData imgdata = readScanLines(fileName);
-    ImageData filteredImg = adaptiveFilter(imgdata);
-    vector<vector<unsigned char>> scanlines; 
-
-    cout << endl << "Separate Filters" << endl; 
-    for (size_t y = 0; y < imgdata.h; ++ y) {
-        vector<unsigned char> bestScanline;         // saves best minimum scoring scanline 
-        int minScore = INT_MAX;                     // save best minimum score 
-        size_t start_index = y * imgdata.w * 4; 
-        vector<unsigned char> currScanline = getSingleScanline(imgdata.image, imgdata.w, y);
-
-        // Applies each and every filter and prints out
-        for (int filterType = 0; filterType < 5; ++filterType){
-            vector<unsigned char> filteredScanline = currScanline;
-            applyFilters(filteredScanline, imgdata.w, y, filterType); 
-            printScanLine(filteredScanline, filteredImg.w);
-        }
-    }
-
-    cout << endl<< "Adaptive Filtered" << endl; 
-    for (int y = 0; y < filteredImg.h; ++y) {
-        vector<unsigned char> sl = getSingleScanline(filteredImg.image, filteredImg.w, y);
-        printScanLine(sl, filteredImg.w);         
-    }
-    cout << endl<< "Original" << endl; 
-    printImage(imgdata.image, imgdata.w, imgdata.h);
-    return 0; 
 }
