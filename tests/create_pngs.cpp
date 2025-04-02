@@ -4,6 +4,20 @@
 
 using namespace std; 
 
+void createNewImage(const string fileName, vector<unsigned char> img, unsigned w, 
+unsigned h, LodePNGColorType color = LCT_RGBA, unsigned bitDepth = 8) {        
+    unsigned err = lodepng::encode(fileName, img, w, h, color, bitDepth);
+
+    if(err) {
+        cout << "error could not save image: " << fileName << ' ' << lodepng_error_text(err) << endl; 
+        return; 
+    } else {
+        cout << "Successfully saved image, " << fileName << endl;  
+        return;
+    }
+
+}
+
 // creates rainbow gradient test image 
 vector<unsigned char> createTestPNG1(const string fileName, unsigned w, unsigned h, unsigned alpha) {
     vector<unsigned char> image(w * h * 4);
@@ -18,10 +32,7 @@ vector<unsigned char> createTestPNG1(const string fileName, unsigned w, unsigned
         }
     }
 
-    unsigned err = lodepng::encode(fileName, image, w, h);
-    if (err) {
-        cout << "Encoding error " << err << ": " << lodepng_error_text(err) << endl;
-    } 
+    createNewImage(fileName, image, w, h);
     return image; 
 }
 
@@ -40,10 +51,7 @@ vector<unsigned char> createSolidGrayscalePNG(const string fileName, unsigned w,
         }
     }
 
-    unsigned err = lodepng::encode(fileName, image, w, h);
-    if (err) {
-        cout << "Encoding error " << err << ": " << lodepng_error_text(err) << endl;
-    } 
+    createNewImage(fileName, image, w, h);
     return image; 
 }
 
@@ -64,15 +72,17 @@ vector<unsigned char> createCheckerBoardPNG(const string fileName, unsigned w, u
         }
     }
 
-    unsigned err = lodepng::encode(fileName, image, w, h);
-    if (err) {
-        cout << "Encoding error " << err << ": " << lodepng_error_text(err) << endl;
-    } 
+    createNewImage(fileName, image, w, h);
+    return image; 
+}
+
+vector <unsigned char> createWhiteImage(const string fileName, unsigned w, unsigned h, unsigned alpha) {
+    vector<unsigned char> image(w * h * 4, alpha);          // creates white image as a vector 
+    createNewImage(fileName, image, w, h);
     return image; 
 }
 
 int main() {
-
     const string FOLDER_PATH = "tests/img/";
 
     const string TEST1 = FOLDER_PATH + "test1.png"; 
@@ -82,6 +92,7 @@ int main() {
     const string TEST5 = FOLDER_PATH + "test5.png";
     const string TEST6 = FOLDER_PATH + "test6.png";
     const string TEST7 = FOLDER_PATH + "test7.png";
+    const string WHITE = FOLDER_PATH + "test-white.png";
 
     // Solid images 
     createTestPNG1(TEST1, 16, 16, 255);                     // creates solid image 16 x 16 
@@ -93,6 +104,6 @@ int main() {
     createSolidGrayscalePNG(TEST5, 256, 256, 128);        
     createCheckerBoardPNG(TEST6, 128, 128, 16, 128);        
 
-    // small image used to test
-    createTestPNG1(TEST7, 4, 4, 200); 
+    // white image
+    createWhiteImage(WHITE, 16, 16, 255);                   // solid white image 
 }
