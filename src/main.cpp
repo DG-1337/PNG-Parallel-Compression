@@ -6,18 +6,6 @@
 
 using namespace std; 
 
-struct Pixel pixel; 
-
-void printPixels(vector<vector<Pixel> > pixels) {
-    for (size_t y = 0; y < pixels.size(); y++) {
-        for (size_t x = 0; x < pixels[y].size(); x++) {
-            Pixel p = pixels[y][x];
-            cout << "(" << (int)p.r << "," << (int)p.g << "," << (int)p.b << "," << (int)p.a << ") ";
-        }
-        cout << endl; 
-    }
-}
-
 void write_chunk(ofstream &file, const string &type, const vector<unsigned char> &data) {
     uint32_t length = htonl(data.size());
     file.write(reinterpret_cast<char *>(&length), sizeof(length));
