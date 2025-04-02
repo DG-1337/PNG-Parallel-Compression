@@ -19,15 +19,14 @@ void printScanLine(vector<unsigned char> scanline, unsigned w, int filterMethod)
 // fast approach to compute the filter score by summation of absolute difference 
 int fastFilter_score(vector<unsigned char> filteredScanline, unsigned w) {
     int score = 0; 
-    for(size_t i = 0; i < w; ++i) {
-        // Gets location of pixel values for scanline 
+    for(int i = 1; i < filteredScanline.size(); ++i) {
         score += abs(filteredScanline[i] - filteredScanline[i - 1]);
     }
     return score; 
 }
 
 // helper function to apply each subsequent filter 
-void applyFilters(vector<unsigned char> &img, unsigned w, unsigned currRow, int currFilter) {
+void applyFilters(vector<unsigned char> &img, unsigned w, unsigned currRow = 0, int currFilter = -1) {
     
     switch (currFilter) {
         case 0:
@@ -64,13 +63,13 @@ ImageData adaptiveFilter(ImageData imgdata) {
         int minScore = INT_MAX;                     // save best minimum score 
         size_t start_index = y * imgdata.w * 4;   
 
-         // gets curr scanline to apply filters for
+        // gets curr scanline to apply filters for
         vector<unsigned char> currScanline = getSingleScanline(imgdata.image, imgdata.w, y);       
 
         // Applies each and every filter 
         for (int filterType = 0; filterType < 5; ++filterType){
-            vector<unsigned char> filteredScanline = currScanline;
-            applyFilters(filteredScanline, imgdata.w, y, filterType); 
+            vector<unsigned char> filteredScanline(currScanline);
+            applyFilters(filteredScanline, imgdata.w, 0, filterType); 
             
             int score = fastFilter_score(filteredScanline, imgdata.w);
             if (score < minScore) {
