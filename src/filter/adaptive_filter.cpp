@@ -1,14 +1,6 @@
-#include <stdio.h>
-#include "../../include/filter.h"
-#include "../../include/ReadScanLine.h"
-#include <filesystem>
-#include <algorithm>
+#include "../../include/adaptive_filter.h"
 
-using namespace std; 
-struct ImageData;
-struct Pixel; 
-
-void printScanLine(vector<unsigned char> scanline, unsigned w, int filterMethod = -1){
+void printScanLine(vector<unsigned char> scanline, unsigned w, int filterMethod){
     if(filterMethod > -1){
         cout << "Filter Method: " << filterMethod << endl; 
     }

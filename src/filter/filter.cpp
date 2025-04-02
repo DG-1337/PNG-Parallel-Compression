@@ -1,14 +1,8 @@
-#include <iostream>
-#include <thread>
-#include <vector>
-#include <algorithm>
-#include <cstdlib>
+#include "../../include/filter.h"
 
 using namespace std;
 
-enum FilterType{NONE, SUB, UP, AVERAGE, PAETH};
-
-void applyNoneFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
+void applyNoneFilter()
 {
     return;
 }
@@ -78,7 +72,7 @@ void applyAverageFilter(vector<unsigned char>& image, unsigned width, unsigned c
 
 void applyPaethFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
 {
-    //can't apply paeth filter on first row of image
+    //can't apply average filter on first row of image
     if (currentRow == 0)
     {
         return;
@@ -131,40 +125,5 @@ int paethPredictor(int a, int b, int c)
     else
     {
         return c;
-    }
-}
-
-void applyParallelFilter(FilterType filter, vector<unsigned char>& image, unsigned width, unsigned height)
-{
-    vector<thread> threads;
-
-    //apply filter to all rows
-    for(unsigned row = 0; row < height; row++)
-    {
-        //lambda to apply filter based on type
-        threads.emplace_back([=, &image]()
-        {
-            switch(filter)
-            {
-                case NONE:
-                    applyNoneFilter(image, width, row);
-                    break;
-                case SUB:
-                    applySubFilter(image, width, row);
-                    break;
-                case UP:
-                    applyUpFilter(image, width, row);
-                    break;
-                case AVERAGE:
-                    applyAverageFilter(image, width, row);
-                    break;
-                case PAETH:
-                    applyPaethFilter(image, width, row);
-                    break;
-                default:
-                    break;
-            }
-
-        });
     }
 }

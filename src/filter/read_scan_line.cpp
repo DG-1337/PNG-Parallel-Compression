@@ -1,20 +1,4 @@
-#include "../libs/lodepng.h" 
-#include <iostream>
-#include <vector>
-#include <atomic>
-#include <thread>
-
-using namespace std; 
-
-struct Pixel {
-    unsigned r, g, b, a;
-};
-
-struct ImageData {
-    vector<unsigned char> image; 
-    unsigned w, h; 
-    const string fileName; 
-};
+#include "../../include/read_scan_line.h"
 
 // Single vector approach
 ImageData readScanLines(const string fileName) {
