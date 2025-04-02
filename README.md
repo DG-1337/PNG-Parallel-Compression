@@ -30,7 +30,7 @@ PNG Parallel Compressor is written using mainly C++ for comfortability of multit
 ### Compile the Project
      ```
      cd PNG-Parallel-Compression
-     g++ src/main.cpp src/lodepng.cpp -std=c++11 -stdlib=libc++ -Weverything -o program.out
+     g++ src/main.cpp src/lodepng.cpp src/compression/compression.cpp src/filter/adaptive_filter.cpp src/filter/read_scan_line.cpp src/filter/filter.cpp -std=c++11 -stdlib=libc++ -w -Weverything -o program.out -lz
      ```
 
 ### Testing
