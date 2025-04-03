@@ -4,9 +4,16 @@
 
 using namespace std; 
 
+#define IS_COMPRESSION false
+
 void createNewImage(const string fileName, vector<unsigned char> img, unsigned w, 
 unsigned h, LodePNGColorType color = LCT_RGBA, unsigned bitDepth = 8) {        
     unsigned err = lodepng::encode(fileName, img, w, h, color, bitDepth);
+    lodepng::State state; 
+
+    // Disable image compression from lodepng 
+    state.encoder.zlibsettings.btype = 0;           // zlib will not compress img
+    state.encoder.auto_convert = false;             // keep raw colors
 
     if(err) {
         cout << "error could not save image: " << fileName << ' ' << lodepng_error_text(err) << endl; 
@@ -15,7 +22,6 @@ unsigned h, LodePNGColorType color = LCT_RGBA, unsigned bitDepth = 8) {
         cout << "Successfully saved image, " << fileName << endl;  
         return;
     }
-
 }
 
 // creates rainbow gradient test image 
