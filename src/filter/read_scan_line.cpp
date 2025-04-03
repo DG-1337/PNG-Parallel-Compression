@@ -30,3 +30,35 @@ vector<unsigned char> getSingleScanline(vector<unsigned char> image, unsigned w,
     }
     return scanline;
 }
+
+void readImageMetaData(const string& fileName) {
+    vector<unsigned char> png; 
+    vector<unsigned char> img; 
+
+    unsigned w, h; 
+    lodepng::State state; 
+
+    // load img data into img vector 
+    unsigned l_error = lodepng::load_file(png, fileName); 
+    if(l_error) {
+        cout << "Error loading in the file " << fileName << ": " << lodepng_error_text(l_error) << endl; 
+        return; 
+    }
+
+    // get metadata from png 
+    unsigned d_error = lodepng::decode(img, w, h, state, png); 
+
+    if(d_error) {
+        cout << "Error encoding PNG: " << fileName << ": " << lodepng_error_text(d_error) << endl; 
+        return; 
+    }
+
+    // Access IHDR metadata
+    std::cout << "IHDR Chunk Info:\n";
+    std::cout << "Width: " << w << "\n";
+    std::cout << "Height: " << h << "\n";
+    std::cout << "Bit Depth: " << (int)state.info_png.color.bitdepth << "\n";
+    std::cout << "Compression Method: " << (int)state.info_png.compression_method << "\n";
+    std::cout << "Filter Method: " << (int)state.info_png.filter_method << "\n";
+    std::cout << "Interlace Method: " << (int)state.info_png.interlace_method << "\n";
+}

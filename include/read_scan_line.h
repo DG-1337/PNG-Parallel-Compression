@@ -15,5 +15,6 @@ struct ImageData {
 
 ImageData readScanLines(const string fileName);
 vector<unsigned char> getSingleScanline(vector<unsigned char> image, unsigned w, unsigned currRow);
+void readImageMetaData(const string& fileName); 
 
 #endif;
