@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include "../include/read_scan_line.h"
 #include "../include/compression.h"
-#include "../include/filter.h"
+#include "../include/adaptive_filter.h"
 using namespace std; 
 
 void write_chunk(ofstream &file, const string &type, const vector<unsigned char> &data) {
@@ -113,6 +113,7 @@ int main(int argc, char* argv[]) {
 
     string const filename = argv[1]; 
     ImageData original_image = readScanLines(filename);
+    ImageData filtered_image = adaptiveFilter(original_image);
 
     cout << original_image.w  << " "  << original_image.h <<  " " << original_image.image.size() << endl;
     unsigned int num_cores = thread::hardware_concurrency();
@@ -120,16 +121,20 @@ int main(int argc, char* argv[]) {
     // applys only the sub filter to every scan-line 
     vector<unsigned char> sub_filtered_img = single_filtered_method(original_image.image, original_image.w, original_image.h, 1);  
 
-    write_png(("compressed.png"), original_image.w, original_image.h, sub_filtered_img);
+    write_png(("single_compressed.png"), original_image.w, original_image.h, sub_filtered_img);
+    write_png(("adaptive_compressed.png"), filtered_image.w, filtered_image.h, filtered_image.image); 
 
     // print file size of two images
     uintmax_t original_size = get_file_size(filename);
-    uintmax_t compressed_size = get_file_size("compressed.png");
+    uintmax_t single_compressed_size = get_file_size("single_compressed.png");
+    uintmax_t adaptive_compressed_size = get_file_size("adaptive_compressed.png"); 
     
     // prints difference between uncompressed original image and filtered compressed image 
     cout << "Original size:   " << original_size << " bytes" << endl;
-    cout << "Compressed size: " << compressed_size << " bytes" << endl;
-    cout << "Compression ratio: " << (100.0 * compressed_size / original_size) << "% of original size" << endl;
+    cout << "Single Compressed size: " << single_compressed_size << " bytes" << endl;
+    cout << "Adaptive Compressed size: " << adaptive_compressed_size << " bytes" << endl;
+    cout << "Single Compression ratio: " << (100.0 * single_compressed_size / original_size) << "% of original size" << endl;
+    cout << "Adaptive Compression ratio: " << (100.0 * adaptive_compressed_size / original_size) << "% of original size" << endl;
     
     return 0; 
 }
