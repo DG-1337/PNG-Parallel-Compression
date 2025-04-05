@@ -106,6 +106,7 @@ int main() {
     const string TEST5 = FOLDER_PATH + "test5.png";
     const string TEST6 = FOLDER_PATH + "test6.png";
     const string TEST7 = FOLDER_PATH + "test7.png";
+    const string TEST8 = FOLDER_PATH + "test8.png"; 
     const string WHITE = FOLDER_PATH + "test-white.png";
 
     // Solid images 
@@ -120,4 +121,9 @@ int main() {
 
     // white image
     createWhiteImage(WHITE, 16, 16, 255);                   // solid white image 
+
+    // large images 
+    createTestPNG1(TEST8, 1920, 1080, 255);
+
+    return 0;
 }
