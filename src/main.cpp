@@ -3,8 +3,7 @@
 #include <sys/stat.h>
 #include "../include/read_scan_line.h"
 #include "../include/compression.h"
-#include "../include/adaptive_filter.h"
-
+#include "../include/filter.h"
 using namespace std; 
 
 void write_chunk(ofstream &file, const string &type, const vector<unsigned char> &data) {
@@ -63,10 +62,29 @@ vector <unsigned char> single_filtered_method(const vector<unsigned char> image,
 
     for (unsigned y = 0; y < h; ++y) {
         vector<unsigned char> row(image.begin() + y * w * 4, image.begin() + (y + 1) * w * 4); 
-        // applySubFilter(row, w, 0); 
-        applyFilters(row, w, 0, filterMethod); 
-        result.push_back(filterMethod);                                         // add filter type to start of scanline for decoding, sub: 1
-        result.insert(result.end(), row.begin(), row.end());                    // append result with the filter row 
+        vector<unsigned char> prevRow;
+
+        if (y > 0) {
+            prevRow = vector<unsigned char>(image.begin() + (y - 1) * w * 4, image.begin() + y * w * 4);
+        }
+
+        vector<unsigned char> filteredRow;
+
+        if (filterMethod == 0) {
+            filteredRow = applyNoneFilter(row);
+        } else if (filterMethod == 1) {
+            filteredRow = applySubFilter(row, w);
+        } else if (filterMethod == 2) {
+            filteredRow = applyUpFilter(row, prevRow);
+        } else if (filterMethod == 3) {
+            filteredRow = applyAverageFilter(row, prevRow, w);
+        } else if (filterMethod == 4) {
+            filteredRow = applyPaethFilter(row, prevRow, w);
+        } else {
+            throw runtime_error("Unknown filter method");
+        }
+
+        result.insert(result.end(), filteredRow.begin(), filteredRow.end());  // append result with the filter row 
     }
 
     // sanity check 
