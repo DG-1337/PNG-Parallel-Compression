@@ -20,4 +20,7 @@ void applyPaethFilter(vector<unsigned char>& image, unsigned width, unsigned cur
 
 int paethPredictor(int a, int b, int c);
 
+vector <unsigned char> applyFilteringMethod(const vector<unsigned char> image, unsigned w, unsigned h, int filterMethod);
+
+
 #endif;

@@ -10,11 +10,14 @@ void applyNoneFilter()
 
 void applySubFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
 {
-    if (width < 2) return; // need at least 2 pixels for Sub filter
+
+    // edge cases 
+    if (width < 2) return;                  // need at least 2 pixels for Sub filter
 
     size_t totalSize = image.size();
     size_t rowStart = 4 * currentRow * width;
 
+    // makes sure that image has a valid byte width of 4 
     if (rowStart + width * 4 > totalSize) {
         cerr << "applySubFilter: row out of bounds (rowStart + width * 4 = "
              << rowStart + width * 4 << " > " << totalSize << ")" << endl;
@@ -29,12 +32,13 @@ void applySubFilter(vector<unsigned char>& image, unsigned width, unsigned curre
         int dstIndex = rowStart + 4 * i;
         int srcIndex = 4 * (i - 1);
 
-        image[dstIndex]     -= originalRow[srcIndex];     // red
-        image[dstIndex + 1] -= originalRow[srcIndex + 1]; // green
-        image[dstIndex + 2] -= originalRow[srcIndex + 2]; // blue
-        image[dstIndex + 3] -= originalRow[srcIndex + 3]; // alpha
+        image[dstIndex]     -= originalRow[srcIndex];           // red
+        image[dstIndex + 1] -= originalRow[srcIndex + 1];       // green
+        image[dstIndex + 2] -= originalRow[srcIndex + 2];       // blue
+        image[dstIndex + 3] -= originalRow[srcIndex + 3];       // alpha
     }
 }
+
 
 void applyUpFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
 {
@@ -56,6 +60,7 @@ void applyUpFilter(vector<unsigned char>& image, unsigned width, unsigned curren
         image[index + 3] -= image[index - (width * 4) + 3]; //alpha channel
     }
 }
+
 
 void applyAverageFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
 {
@@ -140,4 +145,27 @@ int paethPredictor(int a, int b, int c)
     {
         return c;
     }
+}
+
+vector <unsigned char> applyFilteringMethod(const vector<unsigned char> image, unsigned w, unsigned h, int filterMethod) {
+    vector <unsigned char> result; 
+
+    if(image.size() != w * h * 4) {
+        throw runtime_error("Error: image size does not match with expected size (w * h * 4)");
+    }
+
+    for (unsigned y = 0; y < h; ++y) {
+        vector<unsigned char> row(image.begin() + y * w * 4, image.begin() + (y + 1) * w * 4); 
+        applySubFilter(row, w, 0); 
+        result.push_back(filterMethod);                                         // add filter type to start of scanline for decoding, sub: 1
+        result.insert(result.end(), row.begin(), row.end());                    // append result with the filter row 
+    }
+
+    // sanity check 
+    size_t expected_size = h * (1 + w * 4); 
+    if(result.size() != expected_size) {
+        throw runtime_error("Error: Filtered scanline != Original image"); 
+    }
+
+    return result; 
 }
