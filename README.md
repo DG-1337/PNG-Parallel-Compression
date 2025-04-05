@@ -26,7 +26,7 @@ PNG Parallel Compressor is written using mainly C++ for comfortability of multit
 ```
 
 ## Installation
-
+    
 ### Compile the Project
      ```
      cd PNG-Parallel-Compression
@@ -35,7 +35,7 @@ PNG Parallel Compressor is written using mainly C++ for comfortability of multit
 
 ### Testing
     ```
-    g++ tests/test_files.cpp src/lodepng.cpp -std=c++11 -stdlib=libc++ -Weverything -o program_test.out
+    g++ tests/test_files.cpp src/lodepng.cpp -std=c++17 -stdlib=libc++ -Weverything -o program_test.out
     ```
 
     Ensure tests/img folder exists 
