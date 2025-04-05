@@ -1,4 +1,5 @@
 #include "../../include/filter.h"
+#include "../../include/read_scan_line.h"
 
 using namespace std;
 
@@ -9,16 +10,29 @@ void applyNoneFilter()
 
 void applySubFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow)
 {
-    //start from second pixel of row
+    if (width < 2) return; // need at least 2 pixels for Sub filter
+
+    size_t totalSize = image.size();
+    size_t rowStart = 4 * currentRow * width;
+
+    if (rowStart + width * 4 > totalSize) {
+        cerr << "applySubFilter: row out of bounds (rowStart + width * 4 = "
+             << rowStart + width * 4 << " > " << totalSize << ")" << endl;
+        return;
+    }
+
+    // Copy original row to avoid in-place mutation issues
+    vector<unsigned char> originalRow(image.begin() + rowStart, image.begin() + rowStart + width * 4);
+
     for(size_t i = 1; i < width; i++)
     {
-        int index = 4 * (currentRow * width + i); //index of pixel in image vector
+        int dstIndex = rowStart + 4 * i;
+        int srcIndex = 4 * (i - 1);
 
-        //subtract previous pixel's value from current pixel value for every channel
-        image[index] -= image[index - 4]; //red channel
-        image[index + 1] -= image[index - 3]; //green channel
-        image[index + 2] -= image[index - 2]; //blue channel
-        image[index + 3] -= image[index - 1]; //alpha channel
+        image[dstIndex]     -= originalRow[srcIndex];     // red
+        image[dstIndex + 1] -= originalRow[srcIndex + 1]; // green
+        image[dstIndex + 2] -= originalRow[srcIndex + 2]; // blue
+        image[dstIndex + 3] -= originalRow[srcIndex + 3]; // alpha
     }
 }
 
