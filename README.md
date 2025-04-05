@@ -28,20 +28,20 @@ PNG Parallel Compressor is written using mainly C++ for comfortability of multit
 ## Installation
     
 ### Compile the Project
-     ```
+     ```bash
      cd PNG-Parallel-Compression
      g++ src/main.cpp src/lodepng.cpp src/compression/compression.cpp src/filter/adaptive_filter.cpp src/filter/read_scan_line.cpp src/filter/filter.cpp -std=c++11 -stdlib=libc++ -w -Weverything -o program.out -lz
      ```
 
-### Testing
+### Sample Images
+    ```bash
+    g++ tests/create_pngs.cpp src/lodepng.cpp -o create_sample_images.out
     ```
-    g++ tests/test_files.cpp src/lodepng.cpp -std=c++17 -stdlib=libc++ -Weverything -o program_test.out
-    ```
-
     Ensure tests/img folder exists 
+    
 ### Run the Executable
-   ```
-    ./program.out
+   ```bash
+    ./program.out <filename.png>
    ```
 
 ## Project Overview
@@ -50,7 +50,7 @@ We propose a multi-threaded approach to PNG compression by implementing parallel
 the filtering and compression stages. Our strategy includes:
 1. Image Segmentation: Instead of processing the entire image sequentially, we divide it into
 smaller chunks (e.g., rows or blocks). Each segment is then processed independently.
-2. Parallel Filters: Using C++ and the std::thread library, multiple threads will apply diƯerent
+2. Parallel Filters: Using C++ and the std::thread library, multiple threads will apply different
 PNG filters simultaneously. The applied filters include:
     * None Filter: Leaves pixel values unchanged.
     * Sub Filter: Modifies each pixel based on the value of the previous pixel in the same
