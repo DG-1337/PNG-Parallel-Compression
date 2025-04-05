@@ -103,6 +103,20 @@ uintmax_t get_file_size(const std::string &path) {
     return rc == 0 ? static_cast<uintmax_t>(stat_buf.st_size) : 0;
 }
 
+// creates new png using lodepng with compression to compare against 
+void encode_with_lodepng(const string fileName, vector<unsigned char> img,  unsigned w, unsigned h) {
+    vector <unsigned char> png; 
+    unsigned error = lodepng::encode(png, img, w, h);
+
+    if(error) {
+        cout << "error could not save image: " << fileName << ' ' << lodepng_error_text(error) << endl; 
+        return; 
+    } else {
+        lodepng::save_file(png, fileName); 
+        cout << "Successfully saved image, " << fileName << endl;  
+        return;
+    }
+}
 
 int main(int argc, char* argv[]) {
     // user doesn't type in file name exit out of program
@@ -113,28 +127,34 @@ int main(int argc, char* argv[]) {
 
     string const filename = argv[1]; 
     ImageData original_image = readScanLines(filename);
+
+    auto start_custom = chrono::high_resolution_clock::now(); 
     ImageData filtered_image = adaptiveFilter(original_image);
 
     cout << original_image.w  << " "  << original_image.h <<  " " << original_image.image.size() << endl;
-    unsigned int num_cores = thread::hardware_concurrency();
+    // unsigned int num_cores = thread::hardware_concurrency();
 
-    // applys only the sub filter to every scan-line 
-    vector<unsigned char> sub_filtered_img = single_filtered_method(original_image.image, original_image.w, original_image.h, 1);  
+    write_png(("custom_compressed.png"), filtered_image.w, filtered_image.h, filtered_image.image); 
+    auto end_custom = chrono::high_resolution_clock::now(); 
 
-    write_png(("single_compressed.png"), original_image.w, original_image.h, sub_filtered_img);
-    write_png(("adaptive_compressed.png"), filtered_image.w, filtered_image.h, filtered_image.image); 
+    // encode using lodepng to compare image to 
+    auto start_lode = chrono::high_resolution_clock::now();
+    encode_with_lodepng("lode_compressed.png", original_image.image, original_image.w, original_image.h);
+    auto end_lode = chrono::high_resolution_clock::now();
 
     // print file size of two images
     uintmax_t original_size = get_file_size(filename);
-    uintmax_t single_compressed_size = get_file_size("single_compressed.png");
     uintmax_t adaptive_compressed_size = get_file_size("adaptive_compressed.png"); 
+
+    // get time taken between lode and custom compression 
+    auto dur_custom = chrono::duration<double, std::milli>(end_custom - start_custom).count();
+    auto dur_lode = chrono::duration<double, std::milli>(end_lode - start_lode).count();
     
     // prints difference between uncompressed original image and filtered compressed image 
     cout << "Original size:   " << original_size << " bytes" << endl;
-    cout << "Single Compressed size: " << single_compressed_size << " bytes" << endl;
-    cout << "Adaptive Compressed size: " << adaptive_compressed_size << " bytes" << endl;
-    cout << "Single Compression ratio: " << (100.0 * single_compressed_size / original_size) << "% of original size" << endl;
-    cout << "Adaptive Compression ratio: " << (100.0 * adaptive_compressed_size / original_size) << "% of original size" << endl;
-    
+    cout << "Custom Compressed size: " << adaptive_compressed_size << " bytes" << endl;
+    cout << "Custom Compression ratio: " << (100.0 * adaptive_compressed_size / original_size) << "% of original size" << endl;
+    cout << "Custom Time elapsed: " << (dur_custom) << endl; 
+    cout << "Lode Time elapsed: " << (dur_lode) << endl; 
     return 0; 
 }
