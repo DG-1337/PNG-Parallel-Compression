@@ -62,3 +62,19 @@ void readImageMetaData(const string& fileName) {
     std::cout << "Filter Method: " << (int)state.info_png.filter_method << "\n";
     std::cout << "Interlace Method: " << (int)state.info_png.interlace_method << "\n";
 }
+
+void printScanLine(vector<unsigned char> scanline, unsigned w, int filterMethod){
+    if(filterMethod > -1){
+        cout << "Filter Method: " << filterMethod << endl; 
+    }
+
+    for (size_t i = 0; i < w; ++i){
+        size_t index = i * 4; 
+        cout << '(' <<
+        (int)scanline[index + 0] << ',' <<
+        (int)scanline[index + 1] << ',' <<
+        (int)scanline[index + 2] << ',' <<
+        (int)scanline[index + 3] << ") ";
+    }
+    cout << endl; 
+}
