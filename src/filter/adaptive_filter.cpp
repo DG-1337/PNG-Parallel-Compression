@@ -134,19 +134,3 @@ ImageData adaptiveFilter(ImageData imgdata) {
 
     return {orderedFiltered, w, h, imgdata.fileName};
 }
-
-// Optional debug helper
-void printImage(vector<unsigned char> pixels, unsigned w, unsigned h) {
-    for (size_t y = 0; y < h; y++) {
-        size_t start_index = y * w * 4;
-        for (size_t x = 0; x < w; x++) {
-            size_t index = start_index + x * 4;
-            cout << "("
-                << (int)pixels[index + 0] << ","
-                << (int)pixels[index + 1] << ","
-                << (int)pixels[index + 2] << ","
-                << (int)pixels[index + 3] << ") ";
-        }
-        cout << endl;
-    }
-}
