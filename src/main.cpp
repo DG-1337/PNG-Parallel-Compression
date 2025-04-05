@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
 
     // print file size of two images
     uintmax_t original_size = get_file_size(filename);
-    uintmax_t adaptive_compressed_size = get_file_size("adaptive_compressed.png"); 
+    uintmax_t adaptive_compressed_size = get_file_size("custom_compressed.png"); 
 
     // get time taken between lode and custom compression 
     auto dur_custom = chrono::duration<double, std::milli>(end_custom - start_custom).count();
