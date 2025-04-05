@@ -8,19 +8,14 @@
 using namespace std;
 int paethPredictor(int a, int b, int c);
 
-void applyNoneFilter();
+vector<unsigned char> applyNoneFilter(const vector<unsigned char>& row);
 
-void applySubFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
+vector<unsigned char> applySubFilter(const vector<unsigned char>& row, unsigned width);
 
-void applyUpFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
+vector<unsigned char> applyUpFilter(const vector<unsigned char>& row, const vector<unsigned char>& prevRow);
 
-void applyAverageFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
+vector<unsigned char> applyAverageFilter(const vector<unsigned char>& row, const vector<unsigned char>& prevRow, unsigned width);
 
-void applyPaethFilter(vector<unsigned char>& image, unsigned width, unsigned currentRow);
-
-int paethPredictor(int a, int b, int c);
-
-vector <unsigned char> applyFilteringMethod(const vector<unsigned char> image, unsigned w, unsigned h, int filterMethod);
-
+vector<unsigned char> applyPaethFilter(const vector<unsigned char>& row, const vector<unsigned char>& prevRow, unsigned width);
 
 #endif;
