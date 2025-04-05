@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sys/stat.h>
 #include "../include/read_scan_line.h"
 #include "../include/compression.h"
 #include "../include/adaptive_filter.h"
@@ -40,12 +41,11 @@ void write_png(const string &filename, uint32_t width, uint32_t height, const ve
     ihdr[12] = 0;  // Interlace method
     write_chunk(file, "IHDR", ihdr);
 
-    // IDAT Chunk (Uncompressed Data)
-    vector<unsigned char> idat;
-    idat.push_back(0x78); // zlib header (Deflate, no compression)
-    idat.push_back(0x01);
-    idat.insert(idat.end(), image_data.begin(), image_data.end());
-    write_chunk(file, "IDAT", idat);
+    // compress image scanlines
+    vector <unsigned char> compressed_data = compress_image(image_data); 
+
+    // IDAT chunk 
+    write_chunk(file, "IDAT", compressed_data);
 
     // IEND Chunk
     write_chunk(file, "IEND", {});
@@ -54,24 +54,64 @@ void write_png(const string &filename, uint32_t width, uint32_t height, const ve
     cout << "PNG written successfully: " << filename << endl;
 }
 
+vector <unsigned char> single_filtered_method(const vector<unsigned char> image, unsigned w, unsigned h, int filterMethod) {
+    vector <unsigned char> result; 
+
+    if(image.size() != w * h * 4) {
+        throw runtime_error("Error: image size does not match with expected size (w * h * 4)");
+    }
+
+    for (unsigned y = 0; y < h; ++y) {
+        vector<unsigned char> row(image.begin() + y * w * 4, image.begin() + (y + 1) * w * 4); 
+        // applySubFilter(row, w, 0); 
+        applyFilters(row, w, 0, filterMethod); 
+        result.push_back(filterMethod);                                         // add filter type to start of scanline for decoding, sub: 1
+        result.insert(result.end(), row.begin(), row.end());                    // append result with the filter row 
+    }
+
+    // sanity check 
+    size_t expected_size = h * (1 + w * 4); 
+    if(result.size() != expected_size) {
+        throw runtime_error("Error: Filtered scanline != Original image"); 
+    }
+
+    return result; 
+}
+
+// helper function to compare sizes between uncompressed and compressed image files 
+uintmax_t get_file_size(const std::string &path) {
+    struct stat stat_buf;
+    int rc = stat(path.c_str(), &stat_buf);
+    return rc == 0 ? static_cast<uintmax_t>(stat_buf.st_size) : 0;
+}
+
+
 int main(int argc, char* argv[]) {
-    const string filename = argv[1]; 
+    // user doesn't type in file name exit out of program
+    if (argc != 2) {
+        cerr << "Usage: " << argv[0] << " <input.png> " << endl; 
+        return 1; 
+    }    
+
+    string const filename = argv[1]; 
     ImageData original_image = readScanLines(filename);
 
     cout << original_image.w  << " "  << original_image.h <<  " " << original_image.image.size() << endl;
     unsigned int num_cores = thread::hardware_concurrency();
 
-    //vector<vector<Pixel> > st_pixels = st_readScanLines(filename);      Single-Threaded, Outdated
-    //vector<vector<Pixel> > mt_pixels = mt_readScanLines(filename);      Multi-Threaded, Outdated
+    // applys only the sub filter to every scan-line 
+    vector<unsigned char> sub_filtered_img = single_filtered_method(original_image.image, original_image.w, original_image.h, 1);  
 
-    ImageData filtered_image = adaptiveFilter(original_image);
-    cout << filtered_image.w << " " << filtered_image.h << " " << filtered_image.image.size() << endl;
+    write_png(("compressed.png"), original_image.w, original_image.h, sub_filtered_img);
 
-    vector<unsigned char> compressed_image;
-    compressed_image = compress_image(filtered_image.image);
-    cout << compressed_image.size() << endl;
+    // print file size of two images
+    uintmax_t original_size = get_file_size(filename);
+    uintmax_t compressed_size = get_file_size("compressed.png");
     
-    write_png(("compressed.png"), original_image.w, original_image.h, compressed_image);
-
+    // prints difference between uncompressed original image and filtered compressed image 
+    cout << "Original size:   " << original_size << " bytes" << endl;
+    cout << "Compressed size: " << compressed_size << " bytes" << endl;
+    cout << "Compression ratio: " << (100.0 * compressed_size / original_size) << "% of original size" << endl;
+    
     return 0; 
 }
