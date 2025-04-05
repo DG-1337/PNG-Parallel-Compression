@@ -13,9 +13,9 @@ using namespace std;
 struct ImageData;
 struct Pixel; 
 
-void printScanLine(vector<unsigned char> scanline, unsigned w, int filterMethod = -1);
-int fastFilter_score(vector<unsigned char> filteredScanline, unsigned w);
-void applyFilters(vector<unsigned char> &img, unsigned w, unsigned currRow, int currFilter);
+void printScanLine(vector<unsigned char> scanline, unsigned w, int filterMethod);
+int fastFilter_score(const vector<unsigned char>& filteredScanline);
+vector<unsigned char> applyFilterMethod(const vector<unsigned char>& row, const vector<unsigned char>& prevRow, unsigned w, int filterMethod);
 ImageData adaptiveFilter(ImageData imgdata);
 void printImage(vector<unsigned char> pixels, unsigned w, unsigned h);
 
