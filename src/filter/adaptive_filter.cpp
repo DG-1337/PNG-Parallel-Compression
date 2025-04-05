@@ -1,100 +1,152 @@
 #include "../../include/adaptive_filter.h"
 #include "../../include/filter.h"
+#include <future>
+#include <algorithm>
+#include <utility>
+#include <iostream>
 
-void printScanLine(vector<unsigned char> scanline, unsigned w, int filterMethod){
-    if(filterMethod > -1){
-        cout << "Filter Method: " << filterMethod << endl; 
-    }
+using namespace std;
 
-    for (size_t i = 0; i < w; ++i){
-        size_t index = i * 4; 
-        cout << '(' <<
-        (int)scanline[index + 0] << ',' <<
-        (int)scanline[index + 1] << ',' <<
-        (int)scanline[index + 2] << ',' <<
-        (int)scanline[index + 3] << ") ";
-    }
-    cout << endl; 
-}
+// Used for debugging stores information on filtering
+struct FilterProfile {
+    int row;
+    vector<int> scores;
+    int bestFilter;
+    int bestScore;
+};
 
-// fast approach to compute the filter score by summation of absolute difference 
+// fast approach to compute the filter score by summation of absolute difference
 int fastFilter_score(const vector<unsigned char>& filteredScanline) {
-    int score = 0; 
-    for(size_t i = 2; i < filteredScanline.size(); ++i) {
+    int score = 0;
+    for (size_t i = 2; i < filteredScanline.size(); ++i) {
         score += abs(filteredScanline[i] - filteredScanline[i - 1]);
     }
-    return score; 
+    return score;
 }
 
-// helper function to apply a single filter using new modular methods
+// helper function to apply a single filter using modular methods
 vector<unsigned char> applyFilterMethod(const vector<unsigned char>& row, const vector<unsigned char>& prevRow, unsigned w, int filterMethod) {
     switch (filterMethod) {
         case 0:
-            return applyNoneFilter(row); 
+            return applyNoneFilter(row);
         case 1:
-            return applySubFilter(row, w); 
+            return applySubFilter(row, w);
         case 2:
-            return applyUpFilter(row, prevRow); 
+            return applyUpFilter(row, prevRow);
         case 3:
-            return applyAverageFilter(row, prevRow, w); 
+            return applyAverageFilter(row, prevRow, w);
         case 4:
-            return applyPaethFilter(row, prevRow, w); 
+            return applyPaethFilter(row, prevRow, w);
         default:
             throw runtime_error("Unknown filter method in applyFilterMethod");
     }
 }
 
-// applys each filter and computes its score to decide which filter is best 
-ImageData adaptiveFilter(ImageData imgdata) {
+// Worker function that returns filtered scanlines and profiling data
+pair<vector<unsigned char>, vector<FilterProfile>> filterWorkerFuture(
+    const vector<unsigned char>& image, unsigned w, unsigned h,
+    size_t startRow, size_t endRow
+) {
+    vector<unsigned char> localFiltered;
+    vector<FilterProfile> localProfiles;
 
-    // Initialize result vector to hold all filtered scanlines + filter bytes
-    vector<unsigned char> filteredVec;
-    filteredVec.reserve(imgdata.h * (1 + imgdata.w * 4));
-
-    for (size_t y = 0; y < imgdata.h; ++y) {
-        vector<unsigned char> currScanline = getSingleScanline(imgdata.image, imgdata.w, y);
+    for (size_t y = startRow; y < endRow; ++y) {
+        vector<unsigned char> currScanline(image.begin() + y * w * 4, image.begin() + (y + 1) * w * 4);
         vector<unsigned char> prevScanline;
 
         if (y > 0) {
-            prevScanline = getSingleScanline(imgdata.image, imgdata.w, y - 1);
+            prevScanline = vector<unsigned char>(image.begin() + (y - 1) * w * 4, image.begin() + y * w * 4);
         }
 
+        vector<int> scores(5);
         vector<unsigned char> bestScanline;
+        int bestScore = INT_MAX;
         int bestFilter = -1;
-        int minScore = INT_MAX;
 
-        // Try all 5 filters
-        for (int filterType = 0; filterType < 5; ++filterType) {
-            vector<unsigned char> filteredScanline = applyFilterMethod(currScanline, prevScanline, imgdata.w, filterType);
+        for (int filter = 0; filter < 5; ++filter) {
+            vector<unsigned char> filtered = applyFilterMethod(currScanline, prevScanline, w, filter);
+            int score = fastFilter_score(filtered);
+            scores[filter] = score;
 
-            int score = fastFilter_score(filteredScanline);
-            if (score < minScore) {
-                minScore = score;
-                bestFilter = filterType;
-                bestScanline = filteredScanline;
+            if (score < bestScore) {
+                bestScore = score;
+                bestFilter = filter;
+                bestScanline = filtered;
             }
         }
 
-        // Add chosen filter scanline to final filtered image
-        filteredVec.insert(filteredVec.end(), bestScanline.begin(), bestScanline.end());
+        localFiltered.insert(localFiltered.end(), bestScanline.begin(), bestScanline.end());
+        localProfiles.push_back({static_cast<int>(y), scores, bestFilter, bestScore});
     }
 
-    // create image struct/object and return it 
-    ImageData filteredImage = {filteredVec, imgdata.w, imgdata.h, imgdata.fileName}; 
-    return filteredImage;
+    return {localFiltered, localProfiles};
 }
 
+// Applies each filter and computes its score to decide the best one
+ImageData adaptiveFilter(ImageData imgdata) {
+    unsigned w = imgdata.w;
+    unsigned h = imgdata.h;
+    const vector<unsigned char>& image = imgdata.image;
+
+    unsigned numThreads = thread::hardware_concurrency();
+    size_t rowsPerThread = h / numThreads;
+    size_t extra = h % numThreads;
+    size_t start = 0;
+
+    vector<future<pair<vector<unsigned char>, vector<FilterProfile>>>> futures;
+
+    for (unsigned t = 0; t < numThreads; ++t) {
+        size_t end = start + rowsPerThread + (t < extra ? 1 : 0);
+
+        futures.push_back(
+            async(launch::async, filterWorkerFuture, cref(image), w, h, start, end)
+        );
+        start = end;
+    }
+
+    vector<unsigned char> filteredVec;
+    vector<FilterProfile> profiles;
+
+    filteredVec.reserve(h * (1 + w * 4));
+    profiles.reserve(h);
+
+    for (auto& fut : futures) {
+        auto [threadFiltered, threadProfiles] = fut.get();
+        filteredVec.insert(filteredVec.end(), threadFiltered.begin(), threadFiltered.end());
+        profiles.insert(profiles.end(), threadProfiles.begin(), threadProfiles.end());
+    }
+
+    sort(profiles.begin(), profiles.end(), [](const FilterProfile& a, const FilterProfile& b) {
+        return a.row < b.row;
+    });
+
+    vector<unsigned char> orderedFiltered;
+    orderedFiltered.reserve(h * (1 + w * 4));
+
+    for (const auto& p : profiles) {
+        size_t rowStart = p.row * (1 + w * 4);
+        orderedFiltered.insert(
+            orderedFiltered.end(),
+            filteredVec.begin() + rowStart,
+            filteredVec.begin() + rowStart + (1 + w * 4)
+        );
+    }
+
+    return {orderedFiltered, w, h, imgdata.fileName};
+}
+
+// Optional debug helper
 void printImage(vector<unsigned char> pixels, unsigned w, unsigned h) {
     for (size_t y = 0; y < h; y++) {
-        size_t start_index = y * w * 4; 
+        size_t start_index = y * w * 4;
         for (size_t x = 0; x < w; x++) {
-            size_t index = start_index + x * 4; 
-            cout << "(" 
-            << (int)pixels[index + 0] << "," 
-            << (int)pixels[index + 1] << "," 
-            << (int)pixels[index + 2] << "," 
-            << (int)pixels[index + 3] << ") ";
+            size_t index = start_index + x * 4;
+            cout << "("
+                << (int)pixels[index + 0] << ","
+                << (int)pixels[index + 1] << ","
+                << (int)pixels[index + 2] << ","
+                << (int)pixels[index + 3] << ") ";
         }
-        cout << endl; 
+        cout << endl;
     }
 }
