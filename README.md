@@ -26,22 +26,23 @@ PNG Parallel Compressor is written using mainly C++ for comfortability of multit
 ```
 
 ## Installation
+Download directly from repo: https://github.com/DG-1337/PNG-Parallel-Compression
     
-### Compile the Project
+### Run the Project
 ```bash
 cd PNG-Parallel-Compression
-g++ src/main.cpp src/lodepng.cpp src/compression/compression.cpp src/filter/adaptive_filter.cpp src/filter/read_scan_line.cpp src/filter/filter.cpp -std=c++11 -stdlib=libc++ -w -Weverything -o program.out -lz
+make
 ```
 
-### Sample Images
+### Create Sample Images 
 ```bash
-g++ tests/create_pngs.cpp src/lodepng.cpp -o create_sample_images.out
+./create-tests
 ```
 Ensure tests/img folder exists 
 
 ### Run the Executable
 ```bash
-./program.out <filename.png>
+./parallel-compression <filename.png>
 ```
 
 ## Project Overview
