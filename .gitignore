@@ -39,3 +39,5 @@ src/test_image.png
 *.png
 
 *.dSYM
+create-tests
+parallel-compression
